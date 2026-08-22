@@ -10,7 +10,15 @@ if (Test-Path -LiteralPath $stageRoot) { Remove-Item -LiteralPath $stageRoot -Re
 New-Item -ItemType Directory -Path $stageRoot | Out-Null
 Copy-Item -LiteralPath $source -Destination $stage -Recurse
 if (Test-Path -LiteralPath $output) { Remove-Item -LiteralPath $output -Force }
-Compress-Archive -LiteralPath $stage -DestinationPath $output -CompressionLevel Optimal
+Push-Location $stageRoot
+try {
+  # bsdtar writes portable POSIX separators inside ZIP archives. PowerShell's
+  # Compress-Archive stores Windows backslashes, rejected by the Mod Portal.
+  & tar.exe -a -cf $output "companion-dashboard_0.1.0"
+  if ($LASTEXITCODE -ne 0) { throw "tar.exe failed with exit code $LASTEXITCODE" }
+} finally {
+  Pop-Location
+}
 Remove-Item -LiteralPath $stageRoot -Recurse -Force
 
 Write-Output $output
