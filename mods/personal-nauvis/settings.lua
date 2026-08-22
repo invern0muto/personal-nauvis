@@ -16,5 +16,14 @@ data:extend({
     minimum_value = 0,
     maximum_value = 180,
     order = "b"
+  },
+  {
+    type = "int-setting",
+    name = "personal-nauvis-reentry-protection-minutes",
+    setting_type = "runtime-global",
+    default_value = 2,
+    minimum_value = 0,
+    maximum_value = 10,
+    order = "c"
   }
 })

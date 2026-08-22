@@ -68,3 +68,10 @@ Date: 2026-08-22
   Balance:
     - Replace the excessive Advanced kit with an Accelerated Start focused on conventional early-to-mid-game infrastructure.
     - Remove endgame armour, fusion equipment, assembling machines 3, express logistics, rocket components and the rocket silo from the starter kit.
+Version: 0.7.4
+Date: 2026-08-22
+  Features:
+    - Allow dedicated-server console commands to change a guest between Co-op and PvP.
+    - Keep personal surfaces protected briefly after their owner reconnects.
+  Changes:
+    - Expose reconnect protection state to companion dashboards.

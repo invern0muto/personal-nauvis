@@ -82,6 +82,16 @@ local function set_surface_protection(record, protected)
   record.protected = protected
 end
 
+local function reentry_protection_ticks()
+  return settings.global["personal-nauvis-reentry-protection-minutes"].value * 60 * 60
+end
+
+local function refresh_surface_protection(record)
+  local protected = not record.online
+    or (record.reentry_protection_until and game.tick < record.reentry_protection_until)
+  set_surface_protection(record, protected)
+end
+
 local function rebuild_surface_owners()
   local state = ensure_storage()
   state.surface_owners = {}
@@ -96,7 +106,7 @@ local function rebuild_surface_owners()
     local player = game.get_player(player_index)
     record.online = player and player.connected or false
     state.surface_owners[record.surface] = player_index
-    set_surface_protection(record, not record.online)
+  refresh_surface_protection(record)
   end
 end
 
@@ -140,7 +150,7 @@ local function assign_owner(player)
   state.owner_index = player.index
   state.players[player.index] = record
   state.surface_owners[nauvis.name] = player.index
-  set_surface_protection(record, not record.online)
+    refresh_surface_protection(record)
   return record
 end
 
@@ -593,8 +603,15 @@ script.on_event(defines.events.on_player_joined_game, function(event)
     if record.mode and game.forces[record.force_name] then
       player.force = game.forces[record.force_name]
     end
+    local was_protected = record.protected or not record.online
     record.online = true
-    set_surface_protection(record, false)
+    local grace_ticks = reentry_protection_ticks()
+    record.reentry_protection_until = was_protected and grace_ticks > 0
+      and game.tick + grace_ticks or nil
+    refresh_surface_protection(record)
+    if record.reentry_protection_until then
+      player.print({"personal-nauvis.reentry-protection", tostring(grace_ticks / 3600)})
+    end
     if player.surface.name == record.surface then show_onboarding(player) end
   end
 end)
@@ -605,7 +622,8 @@ script.on_event(defines.events.on_player_left_game, function(event)
   local record = player_record(event.player_index)
   if record then
     record.online = false
-    set_surface_protection(record, true)
+    record.reentry_protection_until = nil
+    refresh_surface_protection(record)
   end
 end)
 
@@ -649,7 +667,15 @@ script.on_nth_tick(10, function()
     local online = player and player.connected or false
     if record.online ~= online then
       record.online = online
-      set_surface_protection(record, not online)
+      if not online then record.reentry_protection_until = nil end
+      refresh_surface_protection(record)
+    end
+    if record.reentry_protection_until and game.tick >= record.reentry_protection_until then
+      record.reentry_protection_until = nil
+      refresh_surface_protection(record)
+      if player and player.connected then
+        player.print({"personal-nauvis.reentry-protection-ended"})
+      end
     end
     if record.pvp_grace_until and game.tick >= record.pvp_grace_until then
       record.pvp_grace_until = nil
@@ -747,23 +773,35 @@ commands.add_command("pn-inspect", {"personal-nauvis.command-inspect-help"}, fun
 end)
 
 commands.add_command("pn-set-mode", {"personal-nauvis.command-set-mode-help"}, function(command)
-  local admin = require_admin(command)
-  if not admin then return end
+  local admin = command.player_index and require_admin(command) or nil
+  if command.player_index and not admin then return end
   local target_name, mode = string.match(command.parameter or "", "^%s*(.-)%s+([%a]+)%s*$")
   mode = mode and string.lower(mode) or nil
   if not target_name or target_name == "" or (mode ~= "coop" and mode ~= "pvp") then
-    admin.print({"personal-nauvis.set-mode-usage"})
+    if admin then admin.print({"personal-nauvis.set-mode-usage"}) else log("[Personal Nauvis] usage: /pn-set-mode <player> <coop|pvp>") end
     return
   end
   local target = find_player(target_name)
-  if not target then admin.print({"personal-nauvis.player-not-found"}); return end
-  local ok, result = set_player_mode(target, mode)
-  if not ok then
-    admin.print({"personal-nauvis.set-mode-failed-" .. result, target.name, {"personal-nauvis.mode-" .. mode}})
+  if not target then
+    if admin then admin.print({"personal-nauvis.player-not-found"}) else log("[Personal Nauvis] player not found") end
     return
   end
-  admin.print({"personal-nauvis.set-mode-complete", target.name,
-    {"personal-nauvis.mode-" .. mode}, tostring(result)})
+  local ok, result = set_player_mode(target, mode)
+  if not ok then
+    if admin then
+      admin.print({"personal-nauvis.set-mode-failed-" .. result, target.name, {"personal-nauvis.mode-" .. mode}})
+    else
+      log("[Personal Nauvis] mode change failed for " .. target.name .. ": " .. tostring(result))
+    end
+    return
+  end
+  if admin then
+    admin.print({"personal-nauvis.set-mode-complete", target.name,
+      {"personal-nauvis.mode-" .. mode}, tostring(result)})
+  else
+    log("[Personal Nauvis] changed " .. target.name .. " to " .. mode
+      .. "; transferred entities: " .. tostring(result))
+  end
   if target.connected then
     target.print({"personal-nauvis.set-mode-player", {"personal-nauvis.mode-" .. mode}})
   end
@@ -895,7 +933,8 @@ remote.add_interface("personal_nauvis", {
         protected = record.protected or false,
         mode = record.mode,
         force_name = record.force_name,
-        pvp_grace_until = record.pvp_grace_until
+        pvp_grace_until = record.pvp_grace_until,
+        reentry_protection_until = record.reentry_protection_until
       }
     end
     return result
