@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.1.0
+Date: 2026-08-22
+  Features:
+    - First Personal Nauvis Companion Dashboard release.
+    - Personal-world ownership, online status and co-op/PvP mode telemetry.
+    - Compatible with existing fdash dashboard readers.
+    - Conflicts with fdash-exporter to prevent duplicate collectors.
+---------------------------------------------------------------------------------------------------

@@ -1,4 +1,5 @@
 /dist/
+.test-companion/
 *.zip
 *.log
 .DS_Store

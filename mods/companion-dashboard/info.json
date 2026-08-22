@@ -1,0 +1,16 @@
+{
+  "name": "companion-dashboard",
+  "version": "0.1.0",
+  "title": "Personal Nauvis Companion Dashboard",
+  "author": "invernomuto; based on fdash-exporter by boehla",
+  "contact": "https://github.com/invern0muto/personal-nauvis/issues",
+  "homepage": "https://pn.vortexbrain.com",
+  "factorio_version": "2.0",
+  "description": "Low-impact telemetry companion for Personal Nauvis and multiplayer servers. Exports factories, resources, logistics, research, platforms, players and personal-world ownership to an external dashboard. Compatible with the fdash output protocol.",
+  "dependencies": [
+    "base >= 2.0.0",
+    "? space-age",
+    "? personal-nauvis >= 0.6.0",
+    "! fdash-exporter"
+  ]
+}
