@@ -15,7 +15,7 @@ join the host in Co-op or create an independent hostile PvP force.
 - Co-op shares the host force; PvP copies current technology once and then separates progression.
 - Personal respawn destinations without changing the force-wide spawn point.
 - Space Age routes from every personal Nauvis to the normal shared planets.
-- Optional one-time Essential, Advanced or Spidertron Only starter choice.
+- Optional one-time Essential, Accelerated Start or Spidertron Only starter choice.
 - Offline protection without deleting enemies, pollution, entities or surfaces.
 - Read-only remote interface for dashboards and companion mods.
 - English and Italian localisation.
@@ -33,8 +33,8 @@ After choosing Co-op or PvP, each guest selects a starter option. Every option g
 starter Spidertron loaded with 100 rockets; if it is destroyed, it is not
 replaced automatically.
 
-- **Advanced kit** — personal equipment, construction and logistic robots,
-  machines, power, rail equipment, a rocket silo and startup materials.
+- **Accelerated Start** — generous conventional factory supplies, construction
+  robots and rail equipment, without endgame armour, machines or a rocket silo.
 - **Essential kit** — enough machines and materials to bootstrap a factory.
 - **Spidertron only** — the vehicle and its 100 rockets, with no extra supplies.
 
@@ -54,6 +54,10 @@ gameplay without relying on console commands.
 - `/pn-visit <player>` — visit another player's Nauvis.
 - `/pn-list` — list assignments, online state and offline protection.
 - `/pn-send-home <player>` — administrator recovery command.
+- `/pn-observe <player>` — invisibly spectate an online player (administrator).
+- `/pn-inspect <player>` — inspect a personal world even while its owner is offline (administrator).
+- `/pn-observe-exit` — restore the administrator's character and position.
+- `/pn-delete-world <player>` — permanently remove an offline personal world and free its slot (administrator).
 
 `/pn-visit` cannot be used to enter the world of a hostile force.
 
@@ -68,9 +72,10 @@ the existing player forces have a mutual cease-fire.
 
 ## Save safety
 
-The mod never deletes surfaces, enemies, pollution or player entities. It does
-not change the global force spawn point. Back up an important save before adding
-or removing any world-generation mod.
+The mod never deletes surfaces automatically. Administrators may deliberately
+delete an offline personal world with `/pn-delete-world`; the original Nauvis
+and online worlds are always rejected. It does not change the global force spawn
+point. Back up an important save before adding or removing any world-generation mod.
 
 This is an early multiplayer release. Test it on a copy of a valuable save
 before using it in production.

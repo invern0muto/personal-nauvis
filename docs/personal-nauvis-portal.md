@@ -77,6 +77,10 @@ Players can move between personal worlds with commands:
 - `/pn-visit <player>` — visit another player's Nauvis.
 - `/pn-list` — show world assignments, online state and protection state.
 - `/pn-send-home <player>` — administrator recovery command for a stranded player.
+- `/pn-observe <player>` — invisibly spectate an online player (administrator).
+- `/pn-inspect <player>` — inspect a personal world even while its owner is offline (administrator).
+- `/pn-observe-exit` — return to the administrator's original character and position.
+- `/pn-delete-world <player>` — permanently delete an offline personal world and free its slot (administrator).
 
 Visiting does not change ownership. A player always respawns on their assigned
 home world. `/pn-visit` cannot cross hostile force boundaries.
@@ -106,9 +110,10 @@ to visitors.
 After choosing Co-op or PvP, every guest receives a one-time starter choice.
 Nothing is placed until the player selects an option:
 
-- **Advanced kit** — power armor equipment, construction and logistic robots,
-  advanced machines, power infrastructure, express logistics, rail equipment,
-  a rocket silo and startup materials.
+- **Accelerated Start** — generous early-to-mid-game materials, conventional
+  machines, power, construction robots and rail equipment. It does not grant
+  endgame armour, assembling machines 3, express logistics, rocket components
+  or a rocket silo.
 - **Essential kit** — basic machines, power, construction robots and enough
   materials to bootstrap a factory without skipping its development.
 - **Spidertron only** — the vehicle and its ammunition, with no extra supplies.
@@ -125,7 +130,8 @@ rather than preventing the world from being created.
 
 The mod is intentionally conservative:
 
-- it never deletes a surface;
+- it never deletes a surface automatically;
+- `/pn-delete-world` rejects the original Nauvis and every online owner;
 - it never clears enemies or pollution;
 - it never clones or overwrites an existing factory;
 - it never changes the global force spawn position;
