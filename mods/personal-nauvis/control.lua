@@ -57,6 +57,7 @@ local function ensure_storage()
   }
   storage.personal_nauvis.surface_owners = storage.personal_nauvis.surface_owners or {}
   storage.personal_nauvis.pvp_ceasefires = storage.personal_nauvis.pvp_ceasefires or {}
+  storage.personal_nauvis.observers = storage.personal_nauvis.observers or {}
   return storage.personal_nauvis
 end
 
@@ -248,6 +249,47 @@ local function require_admin(command)
     return nil
   end
   return player
+end
+
+local function stop_observing(player, silent)
+  local state = ensure_storage()
+  local session = state.observers[player.index]
+  if not session then return false end
+
+  local original_force = game.forces[session.force_name]
+  if original_force then player.force = original_force end
+  local character = session.character
+  if character and character.valid then
+    player.set_controller{type = defines.controllers.character, character = character}
+  elseif player.controller_type ~= defines.controllers.character then
+    player.create_character()
+  end
+  local surface = game.surfaces[session.surface]
+  if surface then player.teleport(session.position, surface) end
+  state.observers[player.index] = nil
+  if not silent then player.print({"personal-nauvis.observe-ended"}) end
+  return true
+end
+
+local function start_observing(admin, target)
+  if not target.connected then return false, "offline" end
+  if admin.index == target.index then return false, "self" end
+  stop_observing(admin, true)
+  if admin.controller_type ~= defines.controllers.character or not admin.character then
+    return false, "controller"
+  end
+  local state = ensure_storage()
+  state.observers[admin.index] = {
+    surface = admin.surface.name,
+    position = {x = admin.position.x, y = admin.position.y},
+    force_name = admin.force.name,
+    character = admin.character,
+    target_index = target.index
+  }
+  admin.set_controller{type = defines.controllers.spectator}
+  admin.teleport(target.position, target.surface)
+  admin.print({"personal-nauvis.observe-started", target.name})
+  return true
 end
 
 local function delete_personal_world(target)
@@ -508,6 +550,8 @@ script.on_event(defines.events.on_player_joined_game, function(event)
 end)
 
 script.on_event(defines.events.on_player_left_game, function(event)
+  local player = game.get_player(event.player_index)
+  if player then stop_observing(player, true) end
   local record = player_record(event.player_index)
   if record then
     record.online = false
@@ -626,7 +670,21 @@ end)
 
 commands.add_command("pn-home", {"personal-nauvis.command-home-help"}, function(command)
   local player = game.get_player(command.player_index)
-  if player then teleport_home(player) end
+  if player and not stop_observing(player, false) then teleport_home(player) end
+end)
+
+commands.add_command("pn-observe", {"personal-nauvis.command-observe-help"}, function(command)
+  local admin = require_admin(command)
+  if not admin then return end
+  local target = find_player(command.parameter)
+  if not target then admin.print({"personal-nauvis.player-not-found"}); return end
+  local ok, reason = start_observing(admin, target)
+  if not ok then admin.print({"personal-nauvis.observe-failed-" .. reason, target.name}) end
+end)
+
+commands.add_command("pn-observe-exit", {"personal-nauvis.command-observe-exit-help"}, function(command)
+  local admin = require_admin(command)
+  if admin and not stop_observing(admin, false) then admin.print({"personal-nauvis.observe-not-active"}) end
 end)
 
 commands.add_command("pn-visit", {"personal-nauvis.command-visit-help"}, function(command)

@@ -42,3 +42,11 @@ Date: 2026-08-22
   Safety:
     - Never delete the host's original Nauvis or a world whose owner is online.
     - Move the offline player safely to the original Nauvis before deleting the surface.
+---------------------------------------------------------------------------------------------------
+Version: 0.7.1
+Date: 2026-08-22
+  Features:
+    - Add an invisible administrator spectator mode with /pn-observe and /pn-observe-exit.
+  Safety:
+    - Preserve and restore the administrator's original character, force, surface and position.
+    - Automatically exit observation when the administrator disconnects.
