@@ -51,6 +51,15 @@ Date: 2026-08-22
     - Preserve and restore the administrator's original character, force, surface and position.
     - Automatically exit observation when the administrator disconnects.
 ---------------------------------------------------------------------------------------------------
+Version: 0.7.3
+Date: 2026-08-22
+  Features:
+    - Add /pn-set-mode PLAYER coop|pvp for administrators.
+    - Transfer the player's personal-world factory to the destination force when its mode changes.
+  Safety:
+    - Keep the original Nauvis owner permanently in Co-op mode.
+
+---------------------------------------------------------------------------------------------------
 Version: 0.7.2
 Date: 2026-08-22
   Features:

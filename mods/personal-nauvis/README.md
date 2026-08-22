@@ -57,6 +57,7 @@ gameplay without relying on console commands.
 - `/pn-observe <player>` — invisibly spectate an online player (administrator).
 - `/pn-inspect <player>` — inspect a personal world even while its owner is offline (administrator).
 - `/pn-observe-exit` — restore the administrator's character and position.
+- `/pn-set-mode <player> coop|pvp` — change a player's mode and transfer their personal-world factory to the new force (administrator).
 - `/pn-delete-world <player>` — permanently remove an offline personal world and free its slot (administrator).
 
 `/pn-visit` cannot be used to enter the world of a hostile force.

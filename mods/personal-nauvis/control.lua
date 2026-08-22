@@ -389,6 +389,14 @@ local function choose_pvp(player, record)
   if not force then
     force = game.create_force(force_name)
     force.copy_from(game.forces[PLAYER_FORCE])
+  else
+    -- Returning from Co-op must not lose technologies completed by the shared
+    -- force while this personal PvP force was dormant.
+    for technology_name, technology in pairs(game.forces[PLAYER_FORCE].technologies) do
+      if technology.researched and force.technologies[technology_name] then
+        force.technologies[technology_name].researched = true
+      end
+    end
   end
 
   record.mode = "pvp"
@@ -413,6 +421,33 @@ local function choose_pvp(player, record)
     end
   end
   record.pvp_grace_until = grace_ticks > 0 and game.tick + grace_ticks or nil
+end
+
+local function transfer_personal_world_force(record, old_force, new_force)
+  local surface = record and game.surfaces[record.surface]
+  if not surface or not old_force or not new_force or old_force == new_force then return 0 end
+  local transferred = 0
+  for _, entity in pairs(surface.find_entities_filtered{force = old_force}) do
+    if entity.valid and entity.type ~= "character" then
+      local ok = pcall(function() entity.force = new_force end)
+      if ok then transferred = transferred + 1 end
+    end
+  end
+  return transferred
+end
+
+local function set_player_mode(target, mode)
+  local record = target and player_record(target.index)
+  if not record then return false, "missing" end
+  if record.original_owner or record.slot == 0 then return false, "original" end
+  if mode ~= "coop" and mode ~= "pvp" then return false, "mode" end
+  if record.mode == mode then return false, "unchanged" end
+
+  local old_force = game.forces[record.force_name] or target.force
+  if mode == "coop" then choose_coop(target, record) else choose_pvp(target, record) end
+  local new_force = game.forces[record.force_name]
+  local transferred = transfer_personal_world_force(record, old_force, new_force)
+  return true, transferred
 end
 
 local function close_mode_choice(player)
@@ -709,6 +744,29 @@ commands.add_command("pn-inspect", {"personal-nauvis.command-inspect-help"}, fun
   if not target then admin.print({"personal-nauvis.player-not-found"}); return end
   local ok, reason = start_inspecting(admin, target)
   if not ok then admin.print({"personal-nauvis.inspect-failed-" .. reason, target.name}) end
+end)
+
+commands.add_command("pn-set-mode", {"personal-nauvis.command-set-mode-help"}, function(command)
+  local admin = require_admin(command)
+  if not admin then return end
+  local target_name, mode = string.match(command.parameter or "", "^%s*(.-)%s+([%a]+)%s*$")
+  mode = mode and string.lower(mode) or nil
+  if not target_name or target_name == "" or (mode ~= "coop" and mode ~= "pvp") then
+    admin.print({"personal-nauvis.set-mode-usage"})
+    return
+  end
+  local target = find_player(target_name)
+  if not target then admin.print({"personal-nauvis.player-not-found"}); return end
+  local ok, result = set_player_mode(target, mode)
+  if not ok then
+    admin.print({"personal-nauvis.set-mode-failed-" .. result, target.name, {"personal-nauvis.mode-" .. mode}})
+    return
+  end
+  admin.print({"personal-nauvis.set-mode-complete", target.name,
+    {"personal-nauvis.mode-" .. mode}, tostring(result)})
+  if target.connected then
+    target.print({"personal-nauvis.set-mode-player", {"personal-nauvis.mode-" .. mode}})
+  end
 end)
 
 commands.add_command("pn-visit", {"personal-nauvis.command-visit-help"}, function(command)
