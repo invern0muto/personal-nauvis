@@ -1,0 +1,14 @@
+/dist/
+*.zip
+*.log
+.DS_Store
+Thumbs.db
+
+# Local credentials and server configuration must never be committed.
+.env
+.env.*
+player-data.json
+server-settings.json
+server-adminlist.json
+server-whitelist.json
+mod-settings.dat

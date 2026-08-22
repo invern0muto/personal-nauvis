@@ -1,0 +1,28 @@
+---------------------------------------------------------------------------------------------------
+Version: 0.6.0
+Date: 2026-08-22
+  Features:
+    - Adds a mandatory first-arrival briefing with a permanent Co-op or PvP choice.
+    - Co-op guests join the host force and share research, buildings and statistics.
+    - PvP guests receive a separate hostile force that copies current technology once, then progresses independently.
+    - Adds a configurable PvP grace period and blocks visit commands between hostile forces.
+    - Displays allegiance, online state and protection state in the assignment list and remote interface.
+
+---------------------------------------------------------------------------------------------------
+Version: 0.5.0
+Date: 2026-08-22
+  Features:
+    - Replaces starter chests with one personal Spidertron carrying the selected kit.
+    - Loads 100 rockets into the starter Spidertron; the vehicle is granted only once.
+    - Recommends Teleporters Space Age 1.2.0 for in-world travel between player surfaces.
+---------------------------------------------------------------------------------------------------
+Version: 0.4.0
+Date: 2026-08-22
+  Features:
+    - Keeps the first player's established Nauvis and creates one fresh Nauvis for each guest.
+    - Shares force, research and standard Space Age planets across all players.
+    - Adds personal respawning, home and visit commands, and administrator recovery tools.
+    - Protects an absent owner's base from damage without deleting enemies or pollution.
+    - Offers each guest a one-time Advanced, Essential or No Assistance starter choice.
+    - Exposes player-world and protection status through a read-only remote interface.
+    - Provides English and Italian localisation.

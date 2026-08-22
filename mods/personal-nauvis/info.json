@@ -1,0 +1,15 @@
+{
+  "name": "personal-nauvis",
+  "version": "0.6.0",
+  "title": "Personal Nauvis",
+  "author": "invernomuto",
+  "contact": "https://github.com/invern0muto/personal-nauvis/issues",
+  "homepage": "https://github.com/invern0muto/personal-nauvis",
+  "factorio_version": "2.0",
+  "dependencies": [
+    "base >= 2.0.0",
+    "? space-age",
+    "? Teleporters_SpaceAge >= 1.2.0"
+  ],
+  "description": "Add personal Nauvis worlds to an existing multiplayer game. Each guest permanently chooses Co-op or PvP on arrival, receives a unique Spidertron starter, and can build independently while the host keeps the established Nauvis."
+}
