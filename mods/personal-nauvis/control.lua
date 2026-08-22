@@ -266,9 +266,7 @@ local function stop_observing(player, silent)
   return true
 end
 
-local function start_observing(admin, target)
-  if not target.connected then return false, "offline" end
-  if admin.index == target.index then return false, "self" end
+local function start_spectating(admin, surface, position, target_index, message)
   stop_observing(admin, true)
   if admin.controller_type ~= defines.controllers.character or not admin.character then
     return false, "controller"
@@ -279,12 +277,34 @@ local function start_observing(admin, target)
     position = {x = admin.position.x, y = admin.position.y},
     force_name = admin.force.name,
     character = admin.character,
-    target_index = target.index
+    target_index = target_index
   }
   admin.set_controller{type = defines.controllers.spectator}
-  admin.teleport(target.position, target.surface)
-  admin.print({"personal-nauvis.observe-started", target.name})
+  if admin.teleport(position, surface) == false then
+    stop_observing(admin, true)
+    return false, "surface"
+  end
+  admin.print(message)
   return true
+end
+
+local function start_observing(admin, target)
+  if not target.connected then return false, "offline" end
+  if admin.index == target.index then return false, "self" end
+  return start_spectating(admin, target.surface, target.position, target.index,
+    {"personal-nauvis.observe-started", target.name})
+end
+
+local function start_inspecting(admin, target)
+  local record = target and player_record(target.index)
+  if not record then return false, "missing" end
+  if record.original_owner or record.slot == 0 then return false, "original" end
+  local surface = game.surfaces[record.surface]
+  if not surface then return false, "surface" end
+  local position = target.connected and target.surface.name == record.surface
+    and target.position or record.spawn
+  return start_spectating(admin, surface, position, target.index,
+    {"personal-nauvis.inspect-started", target.name})
 end
 
 local function delete_personal_world(target)
@@ -680,6 +700,15 @@ end)
 commands.add_command("pn-observe-exit", {"personal-nauvis.command-observe-exit-help"}, function(command)
   local admin = require_admin(command)
   if admin and not stop_observing(admin, false) then admin.print({"personal-nauvis.observe-not-active"}) end
+end)
+
+commands.add_command("pn-inspect", {"personal-nauvis.command-inspect-help"}, function(command)
+  local admin = require_admin(command)
+  if not admin then return end
+  local target = find_player(command.parameter)
+  if not target then admin.print({"personal-nauvis.player-not-found"}); return end
+  local ok, reason = start_inspecting(admin, target)
+  if not ok then admin.print({"personal-nauvis.inspect-failed-" .. reason, target.name}) end
 end)
 
 commands.add_command("pn-visit", {"personal-nauvis.command-visit-help"}, function(command)
