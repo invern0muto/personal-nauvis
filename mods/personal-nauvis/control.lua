@@ -19,22 +19,17 @@ local STARTER_KITS = {
     {"submachine-gun", 1}, {"piercing-rounds-magazine", 100}
   },
   advanced = {
-    {"power-armor-mk2", 1}, {"fusion-reactor-equipment", 2},
-    {"personal-roboport-mk2-equipment", 2}, {"battery-mk2-equipment", 2},
-    {"exoskeleton-equipment", 2}, {"construction-robot", 100},
-    {"logistic-robot", 50}, {"roboport", 10}, {"assembling-machine-3", 40},
-    {"electric-mining-drill", 40}, {"electric-furnace", 40},
-    {"substation", 30}, {"solar-panel", 100}, {"accumulator", 100},
-    {"express-transport-belt", 500}, {"express-underground-belt", 50},
-    {"express-splitter", 25}, {"stack-inserter", 100},
-    {"logistic-chest-passive-provider", 20}, {"logistic-chest-requester", 20},
-    {"logistic-chest-storage", 20}, {"rail", 500}, {"locomotive", 2},
-    {"cargo-wagon", 4}, {"iron-plate", 500}, {"copper-plate", 500},
-    {"steel-plate", 200}, {"electronic-circuit", 400},
-    {"advanced-circuit", 200}, {"processing-unit", 100},
-    {"rocket-fuel", 50}, {"low-density-structure", 50},
-    {"concrete", 200}, {"rocket-silo", 1}, {"combat-shotgun", 1},
-    {"piercing-shotgun-shell", 100}, {"repair-pack", 100}
+    {"iron-plate", 1600}, {"copper-plate", 800}, {"steel-plate", 300},
+    {"electronic-circuit", 600}, {"advanced-circuit", 100},
+    {"transport-belt", 800}, {"underground-belt", 80}, {"splitter", 40},
+    {"inserter", 150}, {"fast-inserter", 50}, {"medium-electric-pole", 120},
+    {"assembling-machine-2", 40}, {"electric-mining-drill", 40},
+    {"steel-furnace", 40}, {"boiler", 10}, {"steam-engine", 20},
+    {"offshore-pump", 2}, {"solar-panel", 60}, {"accumulator", 40},
+    {"roboport", 6}, {"construction-robot", 50},
+    {"rail", 500}, {"locomotive", 1}, {"cargo-wagon", 4},
+    {"repair-pack", 150}, {"submachine-gun", 1},
+    {"piercing-rounds-magazine", 200}
   }
 }
 

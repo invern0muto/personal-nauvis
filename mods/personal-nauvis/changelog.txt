@@ -55,3 +55,6 @@ Version: 0.7.2
 Date: 2026-08-22
   Features:
     - Add optional English InformaTron documentation for gameplay, commands and the public server.
+  Balance:
+    - Replace the excessive Advanced kit with an Accelerated Start focused on conventional early-to-mid-game infrastructure.
+    - Remove endgame armour, fusion equipment, assembling machines 3, express logistics, rocket components and the rocket silo from the starter kit.
