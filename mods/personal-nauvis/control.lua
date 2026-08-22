@@ -52,7 +52,8 @@ local function ensure_storage()
     slots = {},
     pending_arrival = {},
     surface_owners = {},
-    pvp_ceasefires = {}
+    pvp_ceasefires = {},
+    first_player_personal = false
   }
   storage.personal_nauvis.surface_owners = storage.personal_nauvis.surface_owners or {}
   storage.personal_nauvis.pvp_ceasefires = storage.personal_nauvis.pvp_ceasefires or {}
@@ -149,6 +150,7 @@ end
 
 local function ensure_original_owner()
   local state = ensure_storage()
+  if state.first_player_personal then return end
   if state.owner_index and state.players[state.owner_index] then return end
 
   local first_player
@@ -178,7 +180,7 @@ local function assign_player(player)
 
   -- In una partita nuova il primo giocatore diventa proprietario della Nauvis
   -- originale. In una partita esistente viene registrato durante on_init.
-  if not state.owner_index then return assign_owner(player) end
+  if not state.owner_index and not state.first_player_personal then return assign_owner(player) end
 
   local slot = first_free_slot()
   if not slot then
@@ -431,7 +433,12 @@ local function place_starter_spidertron(player, kit_name)
 end
 
 script.on_init(function()
-  ensure_storage()
+  local state = ensure_storage()
+  -- Existing saves already contain at least one player when the mod is first
+  -- installed and therefore preserve the original Nauvis owner. A genuinely
+  -- empty dedicated save has no host/base to preserve, so its first arrival
+  -- receives a personal planet and the complete onboarding flow.
+  state.first_player_personal = #game.players == 0
   ensure_original_owner()
   rebuild_surface_owners()
   unlock_personal_planets()
@@ -497,7 +504,9 @@ script.on_event(defines.events.on_player_respawned, function(event)
   if player then teleport_home(player) end
 end)
 
--- Attende la fine del filmato iniziale prima del primo trasferimento.
+-- A Personal Nauvis arrival starts on the personal planet, not beside the
+-- vanilla crash site. Pending guests leave the intro cutscene immediately;
+-- the short retry loop only waits until Factorio has created their character.
 script.on_nth_tick(10, function()
   local state = ensure_storage()
 
@@ -529,6 +538,10 @@ script.on_nth_tick(10, function()
 
   for player_index in pairs(state.pending_arrival) do
     local player = game.get_player(player_index)
+    if player and player.valid and player.connected
+      and player.controller_type == defines.controllers.cutscene then
+      pcall(function() player.exit_cutscene() end)
+    end
     if player and player.valid and player.connected
       and player.controller_type == defines.controllers.character then
       state.pending_arrival[player_index] = nil

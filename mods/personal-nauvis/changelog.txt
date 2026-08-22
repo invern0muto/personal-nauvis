@@ -26,3 +26,11 @@ Date: 2026-08-22
     - Offers each guest a one-time Advanced, Essential or No Assistance starter choice.
     - Exposes player-world and protection status through a read-only remote interface.
     - Provides English and Italian localisation.
+---------------------------------------------------------------------------------------------------
+Version: 0.6.1
+Date: 2026-08-22
+  Bugfixes:
+    - On a newly created empty dedicated server, the first player now receives a personal Nauvis,
+      the Co-op/PvP choice and the starter Spidertron flow.
+    - Existing saves still preserve their original Nauvis owner and established base.
+    - Personal-world arrivals skip the vanilla crash-site cutscene to match the Spidertron arrival lore.
