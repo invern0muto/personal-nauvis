@@ -50,3 +50,8 @@ Date: 2026-08-22
   Safety:
     - Preserve and restore the administrator's original character, force, surface and position.
     - Automatically exit observation when the administrator disconnects.
+---------------------------------------------------------------------------------------------------
+Version: 0.7.2
+Date: 2026-08-22
+  Features:
+    - Add optional English InformaTron documentation for gameplay, commands and the public server.

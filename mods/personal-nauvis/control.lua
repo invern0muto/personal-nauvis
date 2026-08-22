@@ -765,6 +765,33 @@ end)
 
 -- Interfaccia di sola lettura per fdash-exporter e altri pannelli.
 remote.add_interface("personal_nauvis", {
+  informatron_menu = function()
+    return {
+      personal_nauvis_modes = 1,
+      personal_nauvis_worlds = 1,
+      personal_nauvis_starter = 1,
+      personal_nauvis_commands = 1,
+      personal_nauvis_server = 1
+    }
+  end,
+  informatron_page_content = function(data)
+    local texts = {
+      personal_nauvis = "page_personal_nauvis_text",
+      personal_nauvis_modes = "page_personal_nauvis_modes_text",
+      personal_nauvis_worlds = "page_personal_nauvis_worlds_text",
+      personal_nauvis_starter = "page_personal_nauvis_starter_text",
+      personal_nauvis_commands = "page_personal_nauvis_commands_text",
+      personal_nauvis_server = "page_personal_nauvis_server_text"
+    }
+    local key = texts[data.page_name]
+    if not key or not data.element or not data.element.valid then return end
+    local label = data.element.add{
+      type = "label",
+      caption = {"personal_nauvis." .. key}
+    }
+    label.style.single_line = false
+    label.style.maximal_width = 850
+  end,
   delete_world = function(player_name)
     local target = find_player(player_name)
     if not target then return {ok = false, reason = "missing"} end
