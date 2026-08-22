@@ -34,3 +34,11 @@ Date: 2026-08-22
       the Co-op/PvP choice and the starter Spidertron flow.
     - Existing saves still preserve their original Nauvis owner and established base.
     - Personal-world arrivals skip the vanilla crash-site cutscene to match the Spidertron arrival lore.
+---------------------------------------------------------------------------------------------------
+Version: 0.7.0
+Date: 2026-08-22
+  Features:
+    - Add a protected administrator command and remote API to delete an offline guest's personal Nauvis and free its slot.
+  Safety:
+    - Never delete the host's original Nauvis or a world whose owner is online.
+    - Move the offline player safely to the original Nauvis before deleting the surface.

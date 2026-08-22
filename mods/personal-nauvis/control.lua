@@ -250,6 +250,44 @@ local function require_admin(command)
   return player
 end
 
+local function delete_personal_world(target)
+  local state = ensure_storage()
+  local record = target and state.players[target.index]
+  if not record then return false, "missing" end
+  if record.original_owner or record.slot == 0 then return false, "original" end
+  if target.connected or record.online then return false, "online" end
+
+  local surface = game.surfaces[record.surface]
+  local nauvis = game.surfaces.nauvis
+  local player_force = game.forces[PLAYER_FORCE]
+  if not nauvis or not player_force then return false, "destination" end
+
+  -- Sposta prima il personaggio offline in un luogo sicuro: il giocatore
+  -- conserva inventario e identita, ma al prossimo accesso ricevera un nuovo
+  -- mondo libero. Nessuna superficie viene eliminata con un giocatore sopra.
+  target.force = player_force
+  local spawn = player_force.get_spawn_position(nauvis)
+  local safe = nauvis.find_non_colliding_position("character", spawn, 32, 0.5) or spawn
+  local move_ok, moved = pcall(function() return target.teleport(safe, nauvis) end)
+  if not move_ok or moved == false then return false, "teleport" end
+
+  if surface and surface.valid then
+    local ok, deleted = pcall(function() return game.delete_surface(surface) end)
+    if not ok or deleted == false then return false, "surface" end
+  end
+
+  state.players[target.index] = nil
+  state.slots[record.slot] = nil
+  state.surface_owners[record.surface] = nil
+  state.pending_arrival[target.index] = nil
+  for key, ceasefire in pairs(state.pvp_ceasefires) do
+    if ceasefire.first == record.force_name or ceasefire.second == record.force_name then
+      state.pvp_ceasefires[key] = nil
+    end
+  end
+  return true, record.slot
+end
+
 local function pvp_grace_ticks()
   return settings.global["personal-nauvis-pvp-grace-minutes"].value * 60 * 60
 end
@@ -653,8 +691,29 @@ commands.add_command("pn-send-home", {"personal-nauvis.command-send-home-help"},
   end
 end)
 
+commands.add_command("pn-delete-world", {"personal-nauvis.command-delete-world-help"}, function(command)
+  local admin = command.player_index and require_admin(command) or nil
+  if command.player_index and not admin then return end
+  local target = find_player(command.parameter)
+  if not target then
+    if admin then admin.print({"personal-nauvis.player-not-found"}) else log("[Personal Nauvis] player not found") end
+    return
+  end
+  local ok, result = delete_personal_world(target)
+  local message = ok and {"personal-nauvis.world-deleted", target.name, tostring(result)}
+    or {"personal-nauvis.world-delete-failed-" .. result, target.name}
+  if admin then admin.print(message) else game.print(message) end
+end)
+
 -- Interfaccia di sola lettura per fdash-exporter e altri pannelli.
 remote.add_interface("personal_nauvis", {
+  delete_world = function(player_name)
+    local target = find_player(player_name)
+    if not target then return {ok = false, reason = "missing"} end
+    local ok, result = delete_personal_world(target)
+    return ok and {ok = true, player_name = target.name, freed_slot = result}
+      or {ok = false, player_name = target.name, reason = result}
+  end,
   get_status = function()
     local result = {}
     local state = ensure_storage()
